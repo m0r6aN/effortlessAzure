@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <AzureFunctionsVersion>v4</AzureFunctionsVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Trigger\Sql\AbbyDataSync.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.2" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.13.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Sql" Version="2.0.145" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.10.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk.Analyzers" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Azure.KeyVault.Extensions" Version="3.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="6.0.0" />
+	<PackageReference Include=" Microsoft.Azure.Functions.Worker.Extensions.Sql" Version="3.0.181-preview" />	 
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Domain.Data\Lanes.DbContext\Domain.DbContext.csproj" />
+    <ProjectReference Include="..\Domain.Data\Tableau.DbContext\Tableau.DbContext.csproj" />
+    <ProjectReference Include="..\Domain.Health\Domain.Health.csproj" />
+    <ProjectReference Include="..\Domain.Interface\Domain.Interface.csproj" />
+    <ProjectReference Include="..\Domain.Utility\Domain.Utility.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Domain\Build\BicepValidator.sh">
+      <SubType>Component</SubType>
+    </None>
+    <None Update="host.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Trigger\Sql\" />
+  </ItemGroup>
+</Project>

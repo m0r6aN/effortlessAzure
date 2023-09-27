@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>Lanes.Health</RootNamespace>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.16.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="7.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+		<PackageReference Include="Quickwire" Version="1.3.2" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Domain.Data\Lanes.DbContext\Domain.DbContext.csproj" />
+	</ItemGroup>	
+	<ItemGroup>
+	  <Using Include="System.Diagnostics" />
+	</ItemGroup>
+</Project>

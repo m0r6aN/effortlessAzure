@@ -1,0 +1,222 @@
+# Pipeline for invoices APim Deployment
+
+trigger: none
+
+variables:
+  - group: invoices-apim-shared-variables
+
+pool:
+  name: Azure Pipelines
+  vmImage: windows-latest
+  demands: azureps
+
+stages:
+- stage: team_deployment
+  condition: ne(variables['apiVersion'], '')
+  jobs:
+    - deployment: deployinvoicesApim
+      displayName: 'Deploy invoices apim instance'
+      environment: TeamSub
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+            - task: AzureCLI@2
+              inputs:
+                azureSubscription: $(devAzureServiceConnection)
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  az deployment group create --name invoicesBicepDeploy --resource-group $(teamRG) --template-file ./APImDeployment/Biceps/Main.bicep --parameters apiName=$(teamApiName) apimName=$(teamApimInstance) env=team backendName=team-factorhawk-invoices-func-eastus nv=team-factorhawk-invoices-func-eastus-key newOrExisting=$(teamNoE) nvKey=$(teamFuncNamedValueKey) backendUrl=$(teamBackendUrl) version=$(apiVersion) slot=$(slotName)
+    - job: TestDeployment
+      displayName: TestingJob
+      dependsOn: deployinvoicesApim
+      pool:
+        vmImage: windows-latest
+        demands:
+        - npm
+      steps:
+      - checkout: self
+      - task: CmdLine@2
+        displayName: install newman
+        inputs:
+          script: npm install -g newman
+          workingDirectory: $(System.DefaultWorkingDirectory)
+      - task: CmdLine@2
+        displayName: run newman test runner
+        continueOnError: True
+        inputs:
+          script: newman run https://api.getpostman.com/collections/19266065-9feaf91b-ba8b-4b76-a7a1-35d432b7d62d?apikey=%APIKEY% --environment https://api.getpostman.com/environments/19818933-373c17f0-8357-474b-b157-5665eb731bb1?apikey=%APIKEY% --folder InvoicesTests --reporters cli,junit --reporter-junit-export Results\InvoicesTests.xml
+          workingDirectory: APImDeployment/Deploy
+      - task: PublishTestResults@2
+        displayName: Publish Test Results
+        inputs:
+          testResultsFiles: '$(System.DefaultWorkingDirectory)\APImDeployment\Deploy\Results\*.xml ' 
+- stage: team_stable_deployment
+  condition: eq(variables['apiVersion'], '')
+  jobs:
+    - deployment: deployinvoicesApim
+      displayName: 'Deploy invoices apim instance'
+      environment: Team
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+            - task: AzureCLI@2
+              inputs:
+                azureSubscription: $(devAzureServiceConnection)
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  az deployment group create --name invoicesBicepDeploy --resource-group $(teamRG) --template-file ./APImDeployment/Biceps/Main.bicep --parameters apiName=$(teamApiName) apimName=$(teamApimInstance) env=team backendName=team-factorhawk-invoices-func-eastus nv=team-factorhawk-invoices-func-eastus-key newOrExisting=$(teamNoE) nvKey=$(teamFuncNamedValueKey) backendUrl=$(teamBackendUrl) version=$(apiVersion) slot=$(slotName)
+    - job: TestDeployment
+      displayName: TestingJob
+      dependsOn: deployinvoicesApim
+      pool:
+        vmImage: windows-latest
+        demands:
+        - npm
+      steps:
+      - checkout: self
+      - task: CmdLine@2
+        displayName: install newman
+        inputs:
+          script: npm install -g newman
+          workingDirectory: $(System.DefaultWorkingDirectory)
+      - task: CmdLine@2
+        displayName: run newman test runner
+        continueOnError: True
+        inputs:
+          script: newman run https://api.getpostman.com/collections/19266065-9feaf91b-ba8b-4b76-a7a1-35d432b7d62d?apikey=%APIKEY% --environment https://api.getpostman.com/environments/19818933-373c17f0-8357-474b-b157-5665eb731bb1?apikey=%APIKEY% --folder InvoicesTests --reporters cli,junit --reporter-junit-export Results\InvoicesTests.xml
+          workingDirectory: APImDeployment/Deploy
+      - task: PublishTestResults@2
+        displayName: Publish Test Results
+        inputs:
+          testResultsFiles: '$(System.DefaultWorkingDirectory)\APImDeployment\Deploy\Results\*.xml '       
+
+- stage: dev_deployment
+  dependsOn: team_deployment
+  jobs:
+    - deployment: deployinvoicesApim
+      displayName: 'Deploy invoices apim instance'
+      environment: Dev
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+            - task: AzureCLI@2
+              inputs:
+                azureSubscription: $(prodAzureServiceConnection)
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  az deployment group create --name invoicesBicepDeploy --resource-group $(devRG) --template-file ./APImDeployment/Biceps/Main.bicep --parameters apiName=$(devApiName) apimName=$(devApimInstance)  env=dev backendName=dev-factorhawk-invoices-func-eastus nv=dev-factorhawk-invoices-func-eastus-key newOrExisting=$(devNoE) nvKey=$(devFuncNamedValueKey) backendUrl=$(devBackendUrl) version=$(apiVersion) slot=$(slotName)
+    - job: TestDeployment
+      displayName: TestingJob
+      dependsOn: deployinvoicesApim
+      pool:
+        vmImage: windows-latest
+        demands:
+        - npm
+      steps:
+      - checkout: self
+      - task: CmdLine@2
+        displayName: install newman
+        inputs:
+          script: npm install -g newman
+          workingDirectory: $(System.DefaultWorkingDirectory)
+      - task: CmdLine@2
+        displayName: run newman test runner
+        continueOnError: True
+        inputs:
+          script: newman run https://api.getpostman.com/collections/19266065-9feaf91b-ba8b-4b76-a7a1-35d432b7d62d?apikey=%APIKEY% --environment https://api.getpostman.com/environments/19818933-373c17f0-8357-474b-b157-5665eb731bb1?apikey=%APIKEY% --folder InvoicesTests --reporters cli,junit --reporter-junit-export Results\InvoicesTests.xml
+          workingDirectory: APImDeployment/Deploy
+      - task: PublishTestResults@2
+        displayName: Publish Test Results
+        inputs:
+          testResultsFiles: '$(System.DefaultWorkingDirectory)\APImDeployment\Deploy\Results\*.xml '
+- stage: stage_deployment
+  dependsOn: dev_deployment
+  jobs:
+    - deployment: deployinvoicesApim
+      displayName: 'Deploy invoices apim instance'
+      environment: Stage
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+            - task: AzureCLI@2
+              inputs:
+                azureSubscription: $(prodAzureServiceConnection)
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  az deployment group create --name invoicesBicepDeploy --resource-group $(stageRG) --template-file ./APImDeployment/Biceps/Main.bicep --parameters apiName=$(stageApiName) apimName=$(stageApimInstance)  env=stage backendName=stage-factorhawk-invoices-func-eastus nv=stage-factorhawk-invoices-func-eastus-key newOrExisting=$(stageNoE) nvKey=$(stageFuncNamedValueKey) backendUrl=$(stageBackendUrl) version=$(apiVersion) slot=$(slotName)
+    - job: TestDeployment
+      displayName: TestingJob
+      dependsOn: deployinvoicesApim
+      pool:
+        vmImage: windows-latest
+        demands:
+        - npm
+      steps:
+      - checkout: self
+      - task: CmdLine@2
+        displayName: install newman
+        inputs:
+          script: npm install -g newman
+          workingDirectory: $(System.DefaultWorkingDirectory)
+      - task: CmdLine@2
+        displayName: run newman test runner
+        continueOnError: True
+        inputs:
+          script: newman run https://api.getpostman.com/collections/19266065-9feaf91b-ba8b-4b76-a7a1-35d432b7d62d?apikey=%APIKEY% --environment https://api.getpostman.com/environments/19818933-373c17f0-8357-474b-b157-5665eb731bb1?apikey=%APIKEY% --folder InvoicesTests --reporters cli,junit --reporter-junit-export Results\InvoicesTests.xml
+          workingDirectory: APImDeployment/Deploy
+      - task: PublishTestResults@2
+        displayName: Publish Test Results
+        inputs:
+          testResultsFiles: '$(System.DefaultWorkingDirectory)\APImDeployment\Deploy\Results\*.xml '
+
+- stage: beta_deployment
+  dependsOn: stage_deployment
+  jobs:
+    - deployment: deployinvoicesApim
+      displayName: 'Deploy invoices apim instance'
+      environment: Beta
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+            - task: AzureCLI@2
+              inputs:
+                azureSubscription: $(prodAzureServiceConnection)
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  az deployment group create --name invoicesBicepDeploy --resource-group $(betaRG) --template-file ./APImDeployment/Biceps/Main.bicep --parameters apiName=$(betaApiName) apimName=$(betaApimInstance)  env=beta backendName=beta-factorhawk-invoices-func-eastus nv=beta-factorhawk-invoices-func-eastus-key newOrExisting=$(betaNoE) nvKey=$(betaFuncNamedValueKey) backendUrl=$(betaBackendUrl) version=$(apiVersion) slot=$(slotName)
+    
+- stage: prod_deployment
+  dependsOn: stage_deployment
+  jobs:
+    - deployment: deployinvoicesApim
+      displayName: 'Deploy invoices apim instance'
+      environment: Production
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+            - task: AzureCLI@2
+              inputs:
+                azureSubscription: $(prodAzureServiceConnection)
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  az deployment group create --name invoicesBicepDeploy --resource-group $(prodRG) --template-file ./APImDeployment/Biceps/Main.bicep --parameters apiName=$(prodApiName) apimName=$(prodApimInstance)  env=prod backendName=prod-factorhawk-invoices-func-eastus nv=prod-factorhawk-invoices-func-eastus-key newOrExisting=$(prodNoE) nvKey=$(prodFuncNamedValueKey) backendUrl=$(prodBackendUrl) version=$(apiVersion) slot=$(slotName)
+
+  

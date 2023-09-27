@@ -1,0 +1,71 @@
+﻿name: $(BuildDefinitionName)_$(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
+trigger:
+  - refs/heads/main
+#parameters:
+#  - name: function
+#    type: string
+variables:
+  Agent.Source.Git.ShallowFetchDepth: 0
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    displayName: Nuget Push
+    pool:
+      name: OTR Self Hosted
+      vmImage: windows-latest
+
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET 6 Core sdk'
+      inputs:
+        packageType: 'sdk'
+        version: '6.0.x'
+
+    - task: gitversion/setup@0
+      inputs:
+        versionSpec: '5.x'
+        includePrerelease: true
+
+    - task: NuGetAuthenticate@0
+      displayName: 'NuGet Authenticate'
+      inputs:
+        nuGetServiceConnections: 'OTR Libraries'
+
+    - task: NuGetToolInstaller@1
+      displayName: 'Use NuGet '
+      inputs:
+        checkLatest: true
+
+    - task: NuGetCommand@2
+      displayName: 'NuGet restore'
+      inputs:
+        feedsToUse: config
+        nugetConfigPath: OTR.Serverless.Schedules.WebClients/NuGet.Config
+        externalFeedCredentials: 'OTR Libraries'
+
+    -  task: gitversion/execute@0
+       displayName: Calculating version
+       inputs:
+           useConfigFile: True
+           configFilePath: OTR.Serverless.Schedules.WebClients/GitVersion.yml
+
+    - task: DotNetCoreCLI@2
+      displayName: Nuget pack
+      inputs:
+        command: 'pack'
+        packagesToPack: '**/*WebClient*.csproj'
+        versioningScheme: byEnvVar
+        versionEnvVar: GitVersion.NuGetVersion
+
+    - task: DotNetCoreCLI@2
+      displayName: Nuget push
+      inputs:
+        command: 'push'
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+        nuGetFeedType: 'internal'
+        publishVstsFeed: '4e9ab41e-bcfb-4e21-a2ea-5aacfc7240cc/9a5ed5a6-2133-4469-ab4b-63b3a4e38d9a'
+        versioningScheme: byBuildNumber
+        allowPackageConflicts: true
+        arguments: '--skip-duplicate'

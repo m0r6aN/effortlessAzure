@@ -1,0 +1,61 @@
+﻿{
+   "CodeGenerationMode": 3,
+   "ContextClassName": "DomainDbContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": "Context",
+   "OutputPath": "Entity",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "MF.Libraries.Data.Lanes",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "Tables": [
+      {
+         "Name": "[dbo].[RateConDetailRate]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RateConInfo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RateConInvoiceId]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RateConReceiver]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RateConShipper]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RateTypes]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "OTR-UIPSQL-200.DataExtract",
+   "UncountableWords": null,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": true,
+   "UseDateOnlyTimeOnly": false,
+   "UseDbContextSplitting": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": true,
+   "UseNoDefaultConstructor": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UseSchemaFolders": false,
+   "UseSpatial": false,
+   "UseT4": false
+}

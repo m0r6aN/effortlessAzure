@@ -1,0 +1,73 @@
+﻿{
+   "CodeGenerationMode": 3,
+   "ContextClassName": "TableauDbContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": "Context",
+   "OutputPath": "Entity",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "MF.Libraries.Data.Tableau",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "Tables": [
+      {
+         "Name": "[LaneMatching].[AbbyyLoadLocations]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[LaneMatching].[CarrierLoadLocations]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[LaneMatching].[EquipmentCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[LaneMatching].[EquipmentGroups]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[LaneMatching].[LoadTenderClientEquipments]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[LaneMatching].[LoadTenderClients]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[LaneMatching].[LoadTenders]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[LaneMatching].[PortalInfos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[LaneMatching].[PortalToCarrierReferences]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "fh-sql2-eus.OTRTableau",
+   "UncountableWords": null,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": true,
+   "UseDateOnlyTimeOnly": false,
+   "UseDbContextSplitting": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": true,
+   "UseNoDefaultConstructor": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UseSchemaFolders": false,
+   "UseSpatial": false,
+   "UseT4": false
+}

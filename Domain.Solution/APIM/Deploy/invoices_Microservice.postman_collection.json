@@ -1,0 +1,2513 @@
+{
+	"info": {
+		"_postman_id": "6f67d2b0-0b12-4bf4-8ccc-37df93954c9d",
+		"name": "invoices_Microservice_Dev",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Invoices",
+			"item": [
+				{
+					"name": "GET",
+					"item": [
+						{
+							"name": "GetPrebuiltLoadById",
+							"item": [
+								{
+									"name": "Setup Test Load",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"Load setup succeeds - returns 2xx\", ()=> {\r",
+													"    pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"postman.setEnvironmentVariable(\"testPrebuiltPostingId\", pm.variables.replaceIn('{{$randomBitcoin}}'))"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{Ocp-Apim-Subscription-Key}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "Ocp-Apim-Subscription-Key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionID",
+												"value": "{{$randomBitcoin}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"postingId\": \"{{testPrebuiltPostingId}}\",\r\n    \"brokerRefNumber\": \"SRT-REF-NUM\",\r\n    \"earliestPickup\": \"{{isoTime1}}\",\r\n    \"latestPickup\": \"{{isoTime2}}\",\r\n    \"lane\": {\r\n        \"origin\": {\r\n            \"address1\": \"{{$randomStreetAddress}}\",\r\n            \"address2\": \"\",\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\"\r\n        },\r\n        \"destination\": {\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\"\r\n        },\r\n        \"equipmentType\": \"TT\",\r\n        \"postedRate\": \"{{$randomPrice}}\"\r\n    },\r\n    \"brokerInfo\": {\r\n        \"mcNumber\": \"{{testPrebuiltCustMcNumber}}\",\r\n        \"name\": \"{{$randomCompanyName}}\"\r\n    },\r\n    \"carrierInfo\": {\r\n        \"partnerCarrierId\": \"{{testPrebuiltPartnerCarrierId}}\",\r\n        \"mcNumber\":  \"{{testPrebuiltClientMcNumber}}\",\r\n        \"dotNumber\": \"{{$randomInt}}\"\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/load",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"load"
+											]
+										},
+										"description": "Create Shipment Load Record.   Loads function as a precursor to invoices in Factorhawk."
+									},
+									"response": []
+								},
+								{
+									"name": "TC01: Valid Response",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var jsonData = pm.response.json();\r",
+													"\r",
+													"const success_schema = {\r",
+													"    \"type\": \"object\",\r",
+													"    \"required\": [\r",
+													"        \"$id\",\r",
+													"        \"postingId\",\r",
+													"        \"brokerRefNumber\",\r",
+													"        \"earliestPickup\",\r",
+													"        \"latestPickup\",\r",
+													"        \"lane\",\r",
+													"        \"additionalFees\",\r",
+													"        \"brokerInfo\",\r",
+													"        \"carrierInfo\"\r",
+													"    ],\r",
+													"    \"properties\": {\r",
+													"        \"$id\": {\r",
+													"            \"type\": \"string\"\r",
+													"        },\r",
+													"        \"postingId\": {\r",
+													"            \"type\": \"string\"\r",
+													"        },\r",
+													"        \"brokerRefNumber\": {\r",
+													"            \"type\": \"string\"\r",
+													"        },\r",
+													"        \"earliestPickup\": {\r",
+													"            \"type\": \"string\"\r",
+													"        },\r",
+													"        \"latestPickup\": {\r",
+													"            \"type\": \"string\"\r",
+													"        },\r",
+													"        \"lane\": {\r",
+													"            \"type\": \"object\",\r",
+													"            \"required\": [\r",
+													"                \"$id\",\r",
+													"                \"origin\",\r",
+													"                \"destination\",\r",
+													"                \"postedRate\",\r",
+													"                \"numberOfStops\",\r",
+													"                \"equipmentType\",\r",
+													"                \"weight\",\r",
+													"                \"length\",\r",
+													"                \"commodityType\"\r",
+													"            ],\r",
+													"            \"properties\": {\r",
+													"                \"$id\": {\r",
+													"                    \"type\": \"string\"\r",
+													"                },\r",
+													"                \"origin\": {\r",
+													"                    \"type\": \"object\",\r",
+													"                    \"required\": [\r",
+													"                        \"$id\",\r",
+													"                        \"address1\",\r",
+													"                        \"address2\",\r",
+													"                        \"city\",\r",
+													"                        \"state\",\r",
+													"                        \"zip\",\r",
+													"                        \"country\",\r",
+													"                        \"latitude\",\r",
+													"                        \"longitude\"\r",
+													"                    ],\r",
+													"                    \"properties\": {\r",
+													"                        \"$id\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"address1\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"address2\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"city\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"state\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"zip\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"country\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"latitude\": {\r",
+													"                            \"type\": \"integer\"\r",
+													"                        },\r",
+													"                        \"longitude\": {\r",
+													"                            \"type\": \"integer\"\r",
+													"                        }\r",
+													"                    }\r",
+													"                },\r",
+													"                \"destination\": {\r",
+													"                    \"type\": \"object\",\r",
+													"                    \"required\": [\r",
+													"                        \"$id\",\r",
+													"                        \"address1\",\r",
+													"                        \"address2\",\r",
+													"                        \"city\",\r",
+													"                        \"state\",\r",
+													"                        \"zip\",\r",
+													"                        \"country\",\r",
+													"                        \"latitude\",\r",
+													"                        \"longitude\"\r",
+													"                    ],\r",
+													"                    \"properties\": {\r",
+													"                        \"$id\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"address1\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"address2\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"city\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"state\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"zip\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"country\": {\r",
+													"                            \"type\": \"string\"\r",
+													"                        },\r",
+													"                        \"latitude\": {\r",
+													"                            \"type\": \"integer\"\r",
+													"                        },\r",
+													"                        \"longitude\": {\r",
+													"                            \"type\": \"integer\"\r",
+													"                        }\r",
+													"                    }\r",
+													"                },\r",
+													"                \"postedRate\": {\r",
+													"                    \"type\": \"number\"\r",
+													"                },\r",
+													"                \"numberOfStops\": {\r",
+													"                    \"type\": \"integer\"\r",
+													"                },\r",
+													"                \"equipmentType\": {\r",
+													"                    \"type\": \"string\"\r",
+													"                },\r",
+													"                \"weight\": {\r",
+													"                    \"type\": \"integer\"\r",
+													"                },\r",
+													"                \"length\": {\r",
+													"                    \"type\": \"integer\"\r",
+													"                },\r",
+													"                \"commodityType\": {\r",
+													"                    \"type\": \"string\"\r",
+													"                }\r",
+													"            }\r",
+													"        },\r",
+													"        \"additionalFees\": {\r",
+													"            \"type\": \"null\"\r",
+													"        },\r",
+													"        \"brokerInfo\": {\r",
+													"            \"type\": \"object\",\r",
+													"            \"required\": [\r",
+													"                \"$id\",\r",
+													"                \"mcNumber\",\r",
+													"                \"name\",\r",
+													"                \"officeLocation\"\r",
+													"            ],\r",
+													"            \"properties\": {\r",
+													"                \"$id\": {\r",
+													"                    \"type\": \"string\"\r",
+													"                },\r",
+													"                \"mcNumber\": {\r",
+													"                    \"type\": \"string\"\r",
+													"                },\r",
+													"                \"name\": {\r",
+													"                    \"type\": \"null\"\r",
+													"                },\r",
+													"                \"officeLocation\": {\r",
+													"                    \"type\": \"null\"\r",
+													"                }\r",
+													"            }\r",
+													"        },\r",
+													"        \"carrierInfo\": {\r",
+													"            \"type\": \"object\",\r",
+													"            \"required\": [\r",
+													"                \"$id\",\r",
+													"                \"partnerCarrierId\",\r",
+													"                \"name\",\r",
+													"                \"mcNumber\",\r",
+													"                \"dotNumber\"\r",
+													"            ],\r",
+													"            \"properties\": {\r",
+													"                \"$id\": {\r",
+													"                    \"type\": \"string\"\r",
+													"                },\r",
+													"                \"partnerCarrierId\": {\r",
+													"                    \"type\": \"string\"\r",
+													"                },\r",
+													"                \"name\": {\r",
+													"                    \"type\": \"string\"\r",
+													"                },\r",
+													"                \"mcNumber\": {\r",
+													"                    \"type\": \"string\"\r",
+													"                },\r",
+													"                \"dotNumber\": {\r",
+													"                    \"type\": \"string\"\r",
+													"                }\r",
+													"            }\r",
+													"        }\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"pm.test(\"Successfully retreives requested load - returns 2xx\", ()=> {\r",
+													"    pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Prebuilt Load by Id - Valid response contains proper schema\",()=> {\r",
+													"    pm.response.to.have.jsonSchema(success_schema);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{Ocp-Apim-Subscription-Key}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "Ocp-Apim-Subscription-Key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/prebuilt-load-by-id?postingId={{testPrebuiltPostingId}}&partnerCarrierId={{testPrebuiltPartnerCarrierId}}",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"prebuilt-load-by-id"
+											],
+											"query": [
+												{
+													"key": "postingId",
+													"value": "{{testPrebuiltPostingId}}"
+												},
+												{
+													"key": "partnerCarrierId",
+													"value": "{{testPrebuiltPartnerCarrierId}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TC02: Unauthorized",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/prebuilt-load-by-id?postingId={{testPrebuiltPostingId}}&partnerCarrierId={{testPrebuiltPartnerCarrierId}}",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"prebuilt-load-by-id"
+											],
+											"query": [
+												{
+													"key": "postingId",
+													"value": "{{testPrebuiltPostingId}}"
+												},
+												{
+													"key": "partnerCarrierId",
+													"value": "{{testPrebuiltPartnerCarrierId}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TC03: Missing PostingId",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/prebuilt-load-by-id?postingId=&partnerCarrierId={{testPrebuiltPartnerCarrierId}}",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"prebuilt-load-by-id"
+											],
+											"query": [
+												{
+													"key": "postingId",
+													"value": ""
+												},
+												{
+													"key": "partnerCarrierId",
+													"value": "{{testPrebuiltPartnerCarrierId}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TC04: Invalid PostingId",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/prebuilt-load-by-id?postingId=11&partnerCarrierId={{testPrebuiltPartnerCarrierId}}",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"prebuilt-load-by-id"
+											],
+											"query": [
+												{
+													"key": "postingId",
+													"value": "11"
+												},
+												{
+													"key": "partnerCarrierId",
+													"value": "{{testPrebuiltPartnerCarrierId}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TC05: Missing PartnerCarrierId",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/prebuilt-load-by-id?postingId={{testPrebuiltPostingId}}&partnerCarrierId",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"prebuilt-load-by-id"
+											],
+											"query": [
+												{
+													"key": "postingId",
+													"value": "{{testPrebuiltPostingId}}"
+												},
+												{
+													"key": "partnerCarrierId",
+													"value": null
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TC05: Invalid PartnerCarrierId",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/prebuilt-load-by-id?postingId={{testPrebuiltPartnerCarrierId}}&partnerCarrierId=11",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"prebuilt-load-by-id"
+											],
+											"query": [
+												{
+													"key": "postingId",
+													"value": "{{testPrebuiltPartnerCarrierId}}"
+												},
+												{
+													"key": "partnerCarrierId",
+													"value": "11"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"//define enums================================================================",
+											"var moment = require('moment');",
+											"var equips = ",
+											"[\"AC\",",
+											"\"BT\",",
+											"\"CN\",",
+											"\"C\",",
+											"\"CI\",",
+											"\"CR\",",
+											"\"CV\",",
+											"\"DD\",",
+											"\"LA\",",
+											"\"DT\",",
+											"\"F\",",
+											"\"FA\",",
+											"\"FN\",",
+											"\"F2\",",
+											"\"FZ\",",
+											"\"FH\",",
+											"\"MX\",",
+											"\"FD\",",
+											"\"FO\",",
+											"\"FC\",",
+											"\"FS\",",
+											"\"FT\",",
+											"\"FM\",",
+											"\"FR\",",
+											"\"HB\",",
+											"\"IR\",",
+											"\"LB\",",
+											"\"LR\",",
+											"\"LO\",",
+											"\"MV\",",
+											"\"NU\",",
+											"\"PO\",",
+											"\"R\",",
+											"\"RA\",",
+											"\"R2\",",
+											"\"RZ\",",
+											"\"RN\",",
+											"\"RL\",",
+											"\"RV\",",
+											"\"RP\",",
+											"\"RM\",",
+											"\"RG\",",
+											"\"SD\",",
+											"\"SR\",",
+											"\"SN\",",
+											"\"SB\",",
+											"\"ST\",",
+											"\"TA\",",
+											"\"TN\",",
+											"\"TS\",",
+											"\"TT\",",
+											"\"V\",",
+											"\"VA\",",
+											"\"VW\",",
+											"\"VS\",",
+											"\"V2\",",
+											"\"VZ\",",
+											"\"VH\",",
+											"\"VI\",",
+											"\"VN\",",
+											"\"VG\",",
+											"\"VL\",",
+											"\"OT\",",
+											"\"VF\",",
+											"\"VT\",",
+											"\"VR\",",
+											"\"VP\",",
+											"\"VB\",",
+											"\"V3\",",
+											"\"VV\",",
+											"\"VC\",",
+											"\"VM\"];",
+											"var states = [ ",
+											"    \"AK\",",
+											"    \"AL\",",
+											"    \"AR\",",
+											"    \"AS\",",
+											"    \"AZ\",",
+											"    \"CA\",",
+											"    \"CO\",",
+											"    \"CT\",",
+											"    \"DC\",",
+											"    \"DE\",",
+											"    \"FL\",",
+											"    \"GA\",",
+											"    \"GU\",",
+											"    \"HI\",",
+											"    \"IA\",",
+											"    \"ID\",",
+											"    \"IL\",",
+											"    \"IN\",",
+											"    \"KS\",",
+											"    \"KY\",",
+											"    \"LA\",",
+											"    \"MA\",",
+											"    \"MD\",",
+											"    \"ME\",",
+											"    \"MI\",",
+											"    \"MN\",",
+											"    \"MO\",",
+											"    \"MS\",",
+											"    \"MT\",",
+											"    \"NC\",",
+											"    \"ND\",",
+											"    \"NE\",",
+											"    \"NH\",",
+											"    \"NJ\",",
+											"    \"NM\",",
+											"    \"NV\",",
+											"    \"NY\",",
+											"    \"OH\",",
+											"    \"OK\",",
+											"    \"OR\",",
+											"    \"PA\",",
+											"    \"PR\",",
+											"    \"RI\",",
+											"    \"SC\",",
+											"    \"SD\",",
+											"    \"TN\",",
+											"    \"TX\",",
+											"    \"UT\",",
+											"    \"VA\",",
+											"    \"VI\",",
+											"    \"VT\",",
+											"    \"WA\",",
+											"    \"WI\",",
+											"    \"WV\",",
+											"    \"WY\"];",
+											"var feeTypes = [",
+											"    \"lumper\",",
+											"    \"fuelAdvance\",",
+											"    \"detention\",",
+											"    \"fees\",",
+											"    \"assesorial\",",
+											"    \"drayage\",",
+											"    \"chassis\"",
+											"];",
+											"",
+											"//set Collection Variables==========================================================",
+											"pm.collectionVariables.set(\"isoTime1\", moment().format());",
+											"pm.collectionVariables.set(\"isoTime2\", moment().format());",
+											"pm.collectionVariables.set(\"validEquipmentType\", _.sample(equips));",
+											"pm.collectionVariables.set(\"randomState\", _.sample(states))",
+											"pm.collectionVariables.set('randLat1', _.random(37,64,true))",
+											"pm.collectionVariables.set('randLong1', _.random(105,159,true))",
+											"pm.collectionVariables.set('randLat2', _.random(37,64,true))",
+											"pm.collectionVariables.set('randLong2', _.random(105,159,true))",
+											"pm.collectionVariables.set('randLat3', _.random(37,64,true))",
+											"pm.collectionVariables.set('randLong3', _.random(105,159,true))",
+											"pm.collectionVariables.set('randFloat1', _.random(1,10,true))",
+											"pm.collectionVariables.set('randFloat2', _.random(1,10,true))",
+											"pm.collectionVariables.set('randomFeeType', _.sample(feeTypes));"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "GetRecentPrebuiltLoadsByMcNumbers",
+							"item": [
+								{
+									"name": "Setup Test Load",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"Load setup succeeds - returns 2xx\", ()=> {\r",
+													"    pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"postman.setEnvironmentVariable(\"testPrebuiltPostingId\", pm.variables.replaceIn('{{$randomBitcoin}}'))"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{Ocp-Apim-Subscription-Key}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "Ocp-Apim-Subscription-Key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionID",
+												"value": "{{$randomBitcoin}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"postingId\": \"{{testPrebuiltPostingId}}\",\r\n    \"brokerRefNumber\": \"SRT-REF-NUM\",\r\n    \"earliestPickup\": \"{{isoTime1}}\",\r\n    \"latestPickup\": \"{{isoTime2}}\",\r\n    \"lane\": {\r\n        \"origin\": {\r\n            \"address1\": \"{{$randomStreetAddress}}\",\r\n            \"address2\": \"\",\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\"\r\n        },\r\n        \"destination\": {\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\"\r\n        },\r\n        \"equipmentType\": \"TT\",\r\n        \"postedRate\": \"{{$randomPrice}}\"\r\n    },\r\n    \"brokerInfo\": {\r\n        \"mcNumber\": \"{{testPrebuiltCustMcNumber}}\",\r\n        \"name\": \"{{$randomCompanyName}}\"\r\n    },\r\n    \"carrierInfo\": {\r\n        \"partnerCarrierId\": \"{{testPrebuiltPartnerCarrierId}}\",\r\n        \"mcNumber\":  \"{{testPrebuiltClientMcNumber}}\",\r\n        \"dotNumber\": \"{{$randomInt}}\"\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/load",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"load"
+											]
+										},
+										"description": "Create Shipment Load Record.   Loads function as a precursor to invoices in Factorhawk."
+									},
+									"response": []
+								},
+								{
+									"name": "TC01: Valid Response",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var jsonData = pm.response.json();\r",
+													"\r",
+													"const success_schema = {\r",
+													"    \"type\": \"object\",\r",
+													"    \"required\": [\r",
+													"        \"$id\",\r",
+													"        \"$values\"\r",
+													"    ],\r",
+													"    \"properties\": {\r",
+													"        \"$id\": {\r",
+													"            \"type\": \"string\"\r",
+													"        },\r",
+													"        \"$values\": {\r",
+													"            \"type\": \"array\",\r",
+													"            \"items\": {\r",
+													"                \"type\": \"object\",\r",
+													"                \"required\": [\r",
+													"                    \"$id\",\r",
+													"                    \"TotalCount\",\r",
+													"                    \"PostingId\",\r",
+													"                    \"PartnerCarrierId\",\r",
+													"                    \"OriginCity\",\r",
+													"                    \"OriginState\",\r",
+													"                    \"OriginZip\",\r",
+													"                    \"DestinationCity\",\r",
+													"                    \"DestinationState\",\r",
+													"                    \"DestinationZip\",\r",
+													"                    \"EarliestPickUpDate\",\r",
+													"                    \"BrokerRefNumber\",\r",
+													"                    \"Status\",\r",
+													"                    \"Rate\"\r",
+													"                ],\r",
+													"                \"properties\": {\r",
+													"                    \"$id\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"TotalCount\": {\r",
+													"                        \"type\": \"integer\"\r",
+													"                    },\r",
+													"                    \"PostingId\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"PartnerCarrierId\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"OriginCity\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"OriginState\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"OriginZip\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"DestinationCity\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"DestinationState\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"DestinationZip\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"EarliestPickUpDate\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"BrokerRefNumber\": {\r",
+													"                        \"type\": \"string\"\r",
+													"                    },\r",
+													"                    \"Status\": {\r",
+													"                        \"type\": \"null\"\r",
+													"                    },\r",
+													"                    \"Rate\": {\r",
+													"                        \"type\": \"null\"\r",
+													"                    }\r",
+													"                }\r",
+													"            }\r",
+													"        }\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"pm.test(\"Successfully retreives requested load - returns 2xx\", ()=> {\r",
+													"    pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Get Recent Prebuilt Loads by McNumbers - Valid response contains proper schema\",()=> {\r",
+													"    pm.response.to.have.jsonSchema(success_schema);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{Ocp-Apim-Subscription-Key}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "Ocp-Apim-Subscription-Key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/recent-prebuilt-loads-by-mcNumbers?clientMcNumber={{testPrebuiltClientMcNumber}}&customerMcNumber={{testPrebuiltCustMcNumber}}&skip=0&take=15&sortSelector=EarliestPickUpDate&sortDescending=true",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"recent-prebuilt-loads-by-mcNumbers"
+											],
+											"query": [
+												{
+													"key": "clientMcNumber",
+													"value": "{{testPrebuiltClientMcNumber}}"
+												},
+												{
+													"key": "customerMcNumber",
+													"value": "{{testPrebuiltCustMcNumber}}"
+												},
+												{
+													"key": "skip",
+													"value": "0"
+												},
+												{
+													"key": "take",
+													"value": "15"
+												},
+												{
+													"key": "sortSelector",
+													"value": "EarliestPickUpDate"
+												},
+												{
+													"key": "sortDescending",
+													"value": "true"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TC02: Missing ClientMcNumber",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/recent-prebuilt-loads-by-mcNumbers?clientMcNumber&customerMcNumber&customerName&skip&take&sortSelector&sortDescending",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"recent-prebuilt-loads-by-mcNumbers"
+											],
+											"query": [
+												{
+													"key": "clientMcNumber",
+													"value": null
+												},
+												{
+													"key": "customerMcNumber",
+													"value": null
+												},
+												{
+													"key": "customerName",
+													"value": null
+												},
+												{
+													"key": "skip",
+													"value": null
+												},
+												{
+													"key": "take",
+													"value": null
+												},
+												{
+													"key": "sortSelector",
+													"value": null
+												},
+												{
+													"key": "sortDescending",
+													"value": null
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TC03: Invalid ClientMcNumber",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/recent-prebuilt-loads-by-mcNumbers?clientMcNumber&customerMcNumber&customerName&skip&take&sortSelector&sortDescending",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"recent-prebuilt-loads-by-mcNumbers"
+											],
+											"query": [
+												{
+													"key": "clientMcNumber",
+													"value": null
+												},
+												{
+													"key": "customerMcNumber",
+													"value": null
+												},
+												{
+													"key": "customerName",
+													"value": null
+												},
+												{
+													"key": "skip",
+													"value": null
+												},
+												{
+													"key": "take",
+													"value": null
+												},
+												{
+													"key": "sortSelector",
+													"value": null
+												},
+												{
+													"key": "sortDescending",
+													"value": null
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TC04: Missing CustomerMcNumber",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/recent-prebuilt-loads-by-mcNumbers?clientMcNumber&customerMcNumber&customerName&skip&take&sortSelector&sortDescending",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"recent-prebuilt-loads-by-mcNumbers"
+											],
+											"query": [
+												{
+													"key": "clientMcNumber",
+													"value": null
+												},
+												{
+													"key": "customerMcNumber",
+													"value": null
+												},
+												{
+													"key": "customerName",
+													"value": null
+												},
+												{
+													"key": "skip",
+													"value": null
+												},
+												{
+													"key": "take",
+													"value": null
+												},
+												{
+													"key": "sortSelector",
+													"value": null
+												},
+												{
+													"key": "sortDescending",
+													"value": null
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TC05: Invalid CustomerMcNumber",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/recent-prebuilt-loads-by-mcNumbers?clientMcNumber&customerMcNumber&customerName&skip&take&sortSelector&sortDescending",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"recent-prebuilt-loads-by-mcNumbers"
+											],
+											"query": [
+												{
+													"key": "clientMcNumber",
+													"value": null
+												},
+												{
+													"key": "customerMcNumber",
+													"value": null
+												},
+												{
+													"key": "customerName",
+													"value": null
+												},
+												{
+													"key": "skip",
+													"value": null
+												},
+												{
+													"key": "take",
+													"value": null
+												},
+												{
+													"key": "sortSelector",
+													"value": null
+												},
+												{
+													"key": "sortDescending",
+													"value": null
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "TC06: Unauthorized",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/recent-prebuilt-loads-by-mcNumbers?clientMcNumber&customerMcNumber&customerName&skip&take&sortSelector&sortDescending",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"recent-prebuilt-loads-by-mcNumbers"
+											],
+											"query": [
+												{
+													"key": "clientMcNumber",
+													"value": null
+												},
+												{
+													"key": "customerMcNumber",
+													"value": null
+												},
+												{
+													"key": "customerName",
+													"value": null
+												},
+												{
+													"key": "skip",
+													"value": null
+												},
+												{
+													"key": "take",
+													"value": null
+												},
+												{
+													"key": "sortSelector",
+													"value": null
+												},
+												{
+													"key": "sortDescending",
+													"value": null
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"//define enums================================================================",
+											"var moment = require('moment');",
+											"var equips = ",
+											"[\"AC\",",
+											"\"BT\",",
+											"\"CN\",",
+											"\"C\",",
+											"\"CI\",",
+											"\"CR\",",
+											"\"CV\",",
+											"\"DD\",",
+											"\"LA\",",
+											"\"DT\",",
+											"\"F\",",
+											"\"FA\",",
+											"\"FN\",",
+											"\"F2\",",
+											"\"FZ\",",
+											"\"FH\",",
+											"\"MX\",",
+											"\"FD\",",
+											"\"FO\",",
+											"\"FC\",",
+											"\"FS\",",
+											"\"FT\",",
+											"\"FM\",",
+											"\"FR\",",
+											"\"HB\",",
+											"\"IR\",",
+											"\"LB\",",
+											"\"LR\",",
+											"\"LO\",",
+											"\"MV\",",
+											"\"NU\",",
+											"\"PO\",",
+											"\"R\",",
+											"\"RA\",",
+											"\"R2\",",
+											"\"RZ\",",
+											"\"RN\",",
+											"\"RL\",",
+											"\"RV\",",
+											"\"RP\",",
+											"\"RM\",",
+											"\"RG\",",
+											"\"SD\",",
+											"\"SR\",",
+											"\"SN\",",
+											"\"SB\",",
+											"\"ST\",",
+											"\"TA\",",
+											"\"TN\",",
+											"\"TS\",",
+											"\"TT\",",
+											"\"V\",",
+											"\"VA\",",
+											"\"VW\",",
+											"\"VS\",",
+											"\"V2\",",
+											"\"VZ\",",
+											"\"VH\",",
+											"\"VI\",",
+											"\"VN\",",
+											"\"VG\",",
+											"\"VL\",",
+											"\"OT\",",
+											"\"VF\",",
+											"\"VT\",",
+											"\"VR\",",
+											"\"VP\",",
+											"\"VB\",",
+											"\"V3\",",
+											"\"VV\",",
+											"\"VC\",",
+											"\"VM\"];",
+											"var states = [ ",
+											"    \"AK\",",
+											"    \"AL\",",
+											"    \"AR\",",
+											"    \"AS\",",
+											"    \"AZ\",",
+											"    \"CA\",",
+											"    \"CO\",",
+											"    \"CT\",",
+											"    \"DC\",",
+											"    \"DE\",",
+											"    \"FL\",",
+											"    \"GA\",",
+											"    \"GU\",",
+											"    \"HI\",",
+											"    \"IA\",",
+											"    \"ID\",",
+											"    \"IL\",",
+											"    \"IN\",",
+											"    \"KS\",",
+											"    \"KY\",",
+											"    \"LA\",",
+											"    \"MA\",",
+											"    \"MD\",",
+											"    \"ME\",",
+											"    \"MI\",",
+											"    \"MN\",",
+											"    \"MO\",",
+											"    \"MS\",",
+											"    \"MT\",",
+											"    \"NC\",",
+											"    \"ND\",",
+											"    \"NE\",",
+											"    \"NH\",",
+											"    \"NJ\",",
+											"    \"NM\",",
+											"    \"NV\",",
+											"    \"NY\",",
+											"    \"OH\",",
+											"    \"OK\",",
+											"    \"OR\",",
+											"    \"PA\",",
+											"    \"PR\",",
+											"    \"RI\",",
+											"    \"SC\",",
+											"    \"SD\",",
+											"    \"TN\",",
+											"    \"TX\",",
+											"    \"UT\",",
+											"    \"VA\",",
+											"    \"VI\",",
+											"    \"VT\",",
+											"    \"WA\",",
+											"    \"WI\",",
+											"    \"WV\",",
+											"    \"WY\"];",
+											"var feeTypes = [",
+											"    \"lumper\",",
+											"    \"fuelAdvance\",",
+											"    \"detention\",",
+											"    \"fees\",",
+											"    \"assesorial\",",
+											"    \"drayage\",",
+											"    \"chassis\"",
+											"];",
+											"",
+											"//set Collection Variables==========================================================",
+											"pm.collectionVariables.set(\"isoTime1\", moment().format());",
+											"pm.collectionVariables.set(\"isoTime2\", moment().format());",
+											"pm.collectionVariables.set(\"validEquipmentType\", _.sample(equips));",
+											"pm.collectionVariables.set(\"randomState\", _.sample(states))",
+											"pm.collectionVariables.set('randLat1', _.random(37,64,true))",
+											"pm.collectionVariables.set('randLong1', _.random(105,159,true))",
+											"pm.collectionVariables.set('randLat2', _.random(37,64,true))",
+											"pm.collectionVariables.set('randLong2', _.random(105,159,true))",
+											"pm.collectionVariables.set('randLat3', _.random(37,64,true))",
+											"pm.collectionVariables.set('randLong3', _.random(105,159,true))",
+											"pm.collectionVariables.set('randFloat1', _.random(1,10,true))",
+											"pm.collectionVariables.set('randFloat2', _.random(1,10,true))",
+											"pm.collectionVariables.set('randomFeeType', _.sample(feeTypes));"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"//define enums================================================================",
+									"var moment = require('moment');",
+									"var equips = ",
+									"[\"AC\",",
+									"\"BT\",",
+									"\"CN\",",
+									"\"C\",",
+									"\"CI\",",
+									"\"CR\",",
+									"\"CV\",",
+									"\"DD\",",
+									"\"LA\",",
+									"\"DT\",",
+									"\"F\",",
+									"\"FA\",",
+									"\"FN\",",
+									"\"F2\",",
+									"\"FZ\",",
+									"\"FH\",",
+									"\"MX\",",
+									"\"FD\",",
+									"\"FO\",",
+									"\"FC\",",
+									"\"FS\",",
+									"\"FT\",",
+									"\"FM\",",
+									"\"FR\",",
+									"\"HB\",",
+									"\"IR\",",
+									"\"LB\",",
+									"\"LR\",",
+									"\"LO\",",
+									"\"MV\",",
+									"\"NU\",",
+									"\"PO\",",
+									"\"R\",",
+									"\"RA\",",
+									"\"R2\",",
+									"\"RZ\",",
+									"\"RN\",",
+									"\"RL\",",
+									"\"RV\",",
+									"\"RP\",",
+									"\"RM\",",
+									"\"RG\",",
+									"\"SD\",",
+									"\"SR\",",
+									"\"SN\",",
+									"\"SB\",",
+									"\"ST\",",
+									"\"TA\",",
+									"\"TN\",",
+									"\"TS\",",
+									"\"TT\",",
+									"\"V\",",
+									"\"VA\",",
+									"\"VW\",",
+									"\"VS\",",
+									"\"V2\",",
+									"\"VZ\",",
+									"\"VH\",",
+									"\"VI\",",
+									"\"VN\",",
+									"\"VG\",",
+									"\"VL\",",
+									"\"OT\",",
+									"\"VF\",",
+									"\"VT\",",
+									"\"VR\",",
+									"\"VP\",",
+									"\"VB\",",
+									"\"V3\",",
+									"\"VV\",",
+									"\"VC\",",
+									"\"VM\"];",
+									"var states = [ ",
+									"    \"AK\",",
+									"    \"AL\",",
+									"    \"AR\",",
+									"    \"AS\",",
+									"    \"AZ\",",
+									"    \"CA\",",
+									"    \"CO\",",
+									"    \"CT\",",
+									"    \"DC\",",
+									"    \"DE\",",
+									"    \"FL\",",
+									"    \"GA\",",
+									"    \"GU\",",
+									"    \"HI\",",
+									"    \"IA\",",
+									"    \"ID\",",
+									"    \"IL\",",
+									"    \"IN\",",
+									"    \"KS\",",
+									"    \"KY\",",
+									"    \"LA\",",
+									"    \"MA\",",
+									"    \"MD\",",
+									"    \"ME\",",
+									"    \"MI\",",
+									"    \"MN\",",
+									"    \"MO\",",
+									"    \"MS\",",
+									"    \"MT\",",
+									"    \"NC\",",
+									"    \"ND\",",
+									"    \"NE\",",
+									"    \"NH\",",
+									"    \"NJ\",",
+									"    \"NM\",",
+									"    \"NV\",",
+									"    \"NY\",",
+									"    \"OH\",",
+									"    \"OK\",",
+									"    \"OR\",",
+									"    \"PA\",",
+									"    \"PR\",",
+									"    \"RI\",",
+									"    \"SC\",",
+									"    \"SD\",",
+									"    \"TN\",",
+									"    \"TX\",",
+									"    \"UT\",",
+									"    \"VA\",",
+									"    \"VI\",",
+									"    \"VT\",",
+									"    \"WA\",",
+									"    \"WI\",",
+									"    \"WV\",",
+									"    \"WY\"];",
+									"var feeTypes = [",
+									"    \"lumper\",",
+									"    \"fuelAdvance\",",
+									"    \"detention\",",
+									"    \"fees\",",
+									"    \"assesorial\",",
+									"    \"drayage\",",
+									"    \"chassis\"",
+									"];",
+									"",
+									"//set Collection Variables==========================================================",
+									"pm.collectionVariables.set(\"isoTime1\", moment().format(\"YYYY-MM-DDTHH:mm:SS\"));",
+									"pm.collectionVariables.set(\"isoTime2\", moment().format(\"YYYY-MM-DDTHH:mm:SS\"));",
+									"pm.collectionVariables.set(\"validEquipmentType\", _.sample(equips));",
+									"pm.collectionVariables.set(\"randomState\", _.sample(states))",
+									"pm.collectionVariables.set('randLat1', _.random(37,64,true))",
+									"pm.collectionVariables.set('randLong1', _.random(105,159,true))",
+									"pm.collectionVariables.set('randLat2', _.random(37,64,true))",
+									"pm.collectionVariables.set('randLong2', _.random(105,159,true))",
+									"pm.collectionVariables.set('randLat3', _.random(37,64,true))",
+									"pm.collectionVariables.set('randLong3', _.random(105,159,true))",
+									"pm.collectionVariables.set('randFloat1', _.random(1,10,true))",
+									"pm.collectionVariables.set('randFloat2', _.random(1,10,true))",
+									"pm.collectionVariables.set('randomFeeType', _.sample(feeTypes));"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "POST",
+					"item": [
+						{
+							"name": "Load",
+							"item": [],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"//define enums================================================================",
+											"var moment = require('moment');",
+											"var equips = ",
+											"[\"AC\",",
+											"\"BT\",",
+											"\"CN\",",
+											"\"C\",",
+											"\"CI\",",
+											"\"CR\",",
+											"\"CV\",",
+											"\"DD\",",
+											"\"LA\",",
+											"\"DT\",",
+											"\"F\",",
+											"\"FA\",",
+											"\"FN\",",
+											"\"F2\",",
+											"\"FZ\",",
+											"\"FH\",",
+											"\"MX\",",
+											"\"FD\",",
+											"\"FO\",",
+											"\"FC\",",
+											"\"FS\",",
+											"\"FT\",",
+											"\"FM\",",
+											"\"FR\",",
+											"\"HB\",",
+											"\"IR\",",
+											"\"LB\",",
+											"\"LR\",",
+											"\"LO\",",
+											"\"MV\",",
+											"\"NU\",",
+											"\"PO\",",
+											"\"R\",",
+											"\"RA\",",
+											"\"R2\",",
+											"\"RZ\",",
+											"\"RN\",",
+											"\"RL\",",
+											"\"RV\",",
+											"\"RP\",",
+											"\"RM\",",
+											"\"RG\",",
+											"\"SD\",",
+											"\"SR\",",
+											"\"SN\",",
+											"\"SB\",",
+											"\"ST\",",
+											"\"TA\",",
+											"\"TN\",",
+											"\"TS\",",
+											"\"TT\",",
+											"\"V\",",
+											"\"VA\",",
+											"\"VW\",",
+											"\"VS\",",
+											"\"V2\",",
+											"\"VZ\",",
+											"\"VH\",",
+											"\"VI\",",
+											"\"VN\",",
+											"\"VG\",",
+											"\"VL\",",
+											"\"OT\",",
+											"\"VF\",",
+											"\"VT\",",
+											"\"VR\",",
+											"\"VP\",",
+											"\"VB\",",
+											"\"V3\",",
+											"\"VV\",",
+											"\"VC\",",
+											"\"VM\"];",
+											"var states = [ ",
+											"    \"AK\",",
+											"    \"AL\",",
+											"    \"AR\",",
+											"    \"AS\",",
+											"    \"AZ\",",
+											"    \"CA\",",
+											"    \"CO\",",
+											"    \"CT\",",
+											"    \"DC\",",
+											"    \"DE\",",
+											"    \"FL\",",
+											"    \"GA\",",
+											"    \"GU\",",
+											"    \"HI\",",
+											"    \"IA\",",
+											"    \"ID\",",
+											"    \"IL\",",
+											"    \"IN\",",
+											"    \"KS\",",
+											"    \"KY\",",
+											"    \"LA\",",
+											"    \"MA\",",
+											"    \"MD\",",
+											"    \"ME\",",
+											"    \"MI\",",
+											"    \"MN\",",
+											"    \"MO\",",
+											"    \"MS\",",
+											"    \"MT\",",
+											"    \"NC\",",
+											"    \"ND\",",
+											"    \"NE\",",
+											"    \"NH\",",
+											"    \"NJ\",",
+											"    \"NM\",",
+											"    \"NV\",",
+											"    \"NY\",",
+											"    \"OH\",",
+											"    \"OK\",",
+											"    \"OR\",",
+											"    \"PA\",",
+											"    \"PR\",",
+											"    \"RI\",",
+											"    \"SC\",",
+											"    \"SD\",",
+											"    \"TN\",",
+											"    \"TX\",",
+											"    \"UT\",",
+											"    \"VA\",",
+											"    \"VI\",",
+											"    \"VT\",",
+											"    \"WA\",",
+											"    \"WI\",",
+											"    \"WV\",",
+											"    \"WY\"];",
+											"var feeTypes = [",
+											"    \"lumper\",",
+											"    \"fuelAdvance\",",
+											"    \"detention\",",
+											"    \"fees\",",
+											"    \"assesorial\",",
+											"    \"drayage\",",
+											"    \"chassis\"",
+											"];",
+											"",
+											"//set Collection Variables==========================================================",
+											"pm.collectionVariables.set(\"isoTime1\", moment().format());",
+											"pm.collectionVariables.set(\"isoTime2\", moment().format());",
+											"pm.collectionVariables.set(\"validEquipmentType\", _.sample(equips));",
+											"pm.collectionVariables.set(\"randomState\", _.sample(states))",
+											"pm.collectionVariables.set('randLat1', _.random(37,64,true))",
+											"pm.collectionVariables.set('randLong1', _.random(105,159,true))",
+											"pm.collectionVariables.set('randLat2', _.random(37,64,true))",
+											"pm.collectionVariables.set('randLong2', _.random(105,159,true))",
+											"pm.collectionVariables.set('randLat3', _.random(37,64,true))",
+											"pm.collectionVariables.set('randLong3', _.random(105,159,true))",
+											"pm.collectionVariables.set('randFloat1', _.random(1,10,true))",
+											"pm.collectionVariables.set('randFloat2', _.random(1,10,true))",
+											"pm.collectionVariables.set('randomFeeType', _.sample(feeTypes));"
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Load",
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{Ocp-Apim-Subscription-Key}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "Ocp-Apim-Subscription-Key",
+											"type": "string"
+										},
+										{
+											"key": "in",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "transactionID",
+										"value": "{{$randomBitcoin}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"postingId\": \"{{$randomBitcoin}}\",\r\n    \"brokerRefNumber\": \"commodo sed aliquip\",\r\n    \"earliestPickup\": \"{{isoTime1}}\",\r\n    \"latestPickup\": \"{{isoTime2}}\",\r\n    \"lane\": {\r\n        \"origin\": {\r\n            \"address1\": \"{{$randomStreetAddress}}\",\r\n            \"address2\": \"\",\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\",\r\n            \"zip\": \"{{$randomCreditCardMask}}1\",\r\n            \"country\": \"{{$randomCountryCode}}\",\r\n            \"lat\": \"{{$randomLatitude}}\",\r\n            \"long\": \"{{$randomLongitude}}\"\r\n        },\r\n        \"destination\": {\r\n            \"address1\": \"{{$randomStreetAddress}}\",\r\n            \"address2\": \"\",\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\",\r\n            \"zip\": \"{{$randomCreditCardMask}}2\",\r\n            \"country\": \"{{$randomCountryCode}}\",\r\n            \"lat\": \"{{$randomLatitude}}\",\r\n            \"long\": \"{{$randomLongitude}}\"\r\n        },\r\n        \"numberOfStops\": 1,\r\n        \"equipmentType\": \"{{validEquipmentType}}\",\r\n        \"postedRate\": \"{{$randomPrice}}\",\r\n        \"length\": \"{{randFloat1}}\",\r\n        \"weight\": \"{{randFloat2}}\",\r\n    },\r\n    \"fees\": [\r\n        {\r\n            \"feeType\": \"{{randomFeeType}}\",\r\n            \"feeAmount\": \"{{$randomPrice}}\",\r\n        },\r\n        {\r\n            \"feeType\": \"{{randomFeeType}}\",\r\n            \"feeAmount\": \"{{$randomPrice}}\",\r\n        }\r\n    ],\r\n    \"brokerInfo\": {\r\n        \"mcNumber\": \"{{$randomInt}}\",\r\n        \"name\": \"{{$randomCompanyName}}\",\r\n        \"officeLocation\": {\r\n            \"address1\": \"{{$randomStreetAddress}}\",\r\n            \"address2\": \"\",\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\",\r\n            \"zip\": \"{{$randomCreditCardMask}}3\",\r\n            \"country\": \"{{$randomCountryCode}}\",\r\n            \"lat\": \"{{$randomLatitude}}\",\r\n            \"long\": \"{{$randomLongitude}}\"\r\n        },\r\n    },\r\n    \"carrierInfo\": {\r\n        \"partnerCarrierId\": \"{{$guid}}\",\r\n        \"mcNumber\":  \"{{$randomInt}}\",\r\n        \"dotNumber\": \"{{$randomInt}}\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{ServiceBaseEndpoint}}/invoices/load",
+									"protocol": "https",
+									"host": [
+										"{{ServiceBaseEndpoint}}"
+									],
+									"path": [
+										"invoices",
+										"load"
+									]
+								},
+								"description": "Create Shipment Load Record.   Loads function as a precursor to invoices in Factorhawk."
+							},
+							"response": [
+								{
+									"name": "TC03: Complete Valid Request",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionID",
+												"value": "{{$randomBitcoin}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"postingId\": \"{{$randomBitcoin}}\",\r\n    \"brokerRefNumber\": \"commodo sed aliquip\",\r\n    \"earliestPickup\": \"{{isoTime1}}\",\r\n    \"latestPickup\": \"{{isoTime2}}\",\r\n    \"lane\": {\r\n        \"origin\": {\r\n            \"address1\": \"{{$randomStreetAddress}}\",\r\n            \"address2\": \"\",\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\",\r\n            \"zip\": \"{{$randomCreditCardMask}}1\",\r\n            \"country\": \"{{$randomCountryCode}}\",\r\n            \"lat\": \"{{$randomLatitude}}\",\r\n            \"long\": \"{{$randomLongitude}}\"\r\n        },\r\n        \"destination\": {\r\n            \"address1\": \"{{$randomStreetAddress}}\",\r\n            \"address2\": \"\",\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\",\r\n            \"zip\": \"{{$randomCreditCardMask}}2\",\r\n            \"country\": \"{{$randomCountryCode}}\",\r\n            \"lat\": \"{{$randomLatitude}}\",\r\n            \"long\": \"{{$randomLongitude}}\"\r\n        },\r\n        \"numberOfStops\": 1,\r\n        \"equipmentType\": \"{{validEquipmentType}}\",\r\n        \"postedRate\": \"{{$randomPrice}}\",\r\n        \"length\": \"{{randFloat1}}\",\r\n        \"weight\": \"{{randFloat2}}\",\r\n    },\r\n    \"fees\": [\r\n        {\r\n            \"feeType\": \"{{randomFeeType}}\",\r\n            \"feeAmount\": \"{{$randomPrice}}\",\r\n        },\r\n        {\r\n            \"feeType\": \"{{randomFeeType}}\",\r\n            \"feeAmount\": \"{{$randomPrice}}\",\r\n        }\r\n    ],\r\n    \"brokerInfo\": {\r\n        \"mcNumber\": \"{{$randomInt}}\",\r\n        \"name\": \"{{$randomCompanyName}}\",\r\n        \"officeLocation\": {\r\n            \"address1\": \"{{$randomStreetAddress}}\",\r\n            \"address2\": \"\",\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\",\r\n            \"zip\": \"{{$randomCreditCardMask}}3\",\r\n            \"country\": \"{{$randomCountryCode}}\",\r\n            \"lat\": \"{{$randomLatitude}}\",\r\n            \"long\": \"{{$randomLongitude}}\"\r\n        },\r\n    },\r\n    \"carrierInfo\": {\r\n        \"partnerCarrierId\": \"{{$guid}}\",\r\n        \"mcNumber\":  \"{{$randomInt}}\",\r\n        \"dotNumber\": \"{{$randomInt}}\"\r\n    }\r\n}"
+										},
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/load-share/load",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"load-share",
+												"load"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Request-Context",
+											"value": "appId=cid-v1:7e381bf4-8a86-42b6-b53f-6d3a134ff015"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 27 Jan 2022 16:40:49 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"Message\": \"Successful Response: Load has been created within OTR.\",\n    \"ReferenceList\": {\n        \"portal_url\": \"https://portal.factorhawk.com/Transaction/preinvoice?postingID=3PxUK4XxMaRJ7tT5QPWVaghqGvzBFL&carrierID=fc63b90a-7254-46e6-ab59-18c06ba916d5\",\n        \"mobile_url\": null,\n        \"invoice_url\": null\n    }\n}"
+								}
+							]
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"//define enums================================================================",
+									"var moment = require('moment');",
+									"var equips = ",
+									"[\"AC\",",
+									"\"BT\",",
+									"\"CN\",",
+									"\"C\",",
+									"\"CI\",",
+									"\"CR\",",
+									"\"CV\",",
+									"\"DD\",",
+									"\"LA\",",
+									"\"DT\",",
+									"\"F\",",
+									"\"FA\",",
+									"\"FN\",",
+									"\"F2\",",
+									"\"FZ\",",
+									"\"FH\",",
+									"\"MX\",",
+									"\"FD\",",
+									"\"FO\",",
+									"\"FC\",",
+									"\"FS\",",
+									"\"FT\",",
+									"\"FM\",",
+									"\"FR\",",
+									"\"HB\",",
+									"\"IR\",",
+									"\"LB\",",
+									"\"LR\",",
+									"\"LO\",",
+									"\"MV\",",
+									"\"NU\",",
+									"\"PO\",",
+									"\"R\",",
+									"\"RA\",",
+									"\"R2\",",
+									"\"RZ\",",
+									"\"RN\",",
+									"\"RL\",",
+									"\"RV\",",
+									"\"RP\",",
+									"\"RM\",",
+									"\"RG\",",
+									"\"SD\",",
+									"\"SR\",",
+									"\"SN\",",
+									"\"SB\",",
+									"\"ST\",",
+									"\"TA\",",
+									"\"TN\",",
+									"\"TS\",",
+									"\"TT\",",
+									"\"V\",",
+									"\"VA\",",
+									"\"VW\",",
+									"\"VS\",",
+									"\"V2\",",
+									"\"VZ\",",
+									"\"VH\",",
+									"\"VI\",",
+									"\"VN\",",
+									"\"VG\",",
+									"\"VL\",",
+									"\"OT\",",
+									"\"VF\",",
+									"\"VT\",",
+									"\"VR\",",
+									"\"VP\",",
+									"\"VB\",",
+									"\"V3\",",
+									"\"VV\",",
+									"\"VC\",",
+									"\"VM\"];",
+									"var states = [ ",
+									"    \"AK\",",
+									"    \"AL\",",
+									"    \"AR\",",
+									"    \"AS\",",
+									"    \"AZ\",",
+									"    \"CA\",",
+									"    \"CO\",",
+									"    \"CT\",",
+									"    \"DC\",",
+									"    \"DE\",",
+									"    \"FL\",",
+									"    \"GA\",",
+									"    \"GU\",",
+									"    \"HI\",",
+									"    \"IA\",",
+									"    \"ID\",",
+									"    \"IL\",",
+									"    \"IN\",",
+									"    \"KS\",",
+									"    \"KY\",",
+									"    \"LA\",",
+									"    \"MA\",",
+									"    \"MD\",",
+									"    \"ME\",",
+									"    \"MI\",",
+									"    \"MN\",",
+									"    \"MO\",",
+									"    \"MS\",",
+									"    \"MT\",",
+									"    \"NC\",",
+									"    \"ND\",",
+									"    \"NE\",",
+									"    \"NH\",",
+									"    \"NJ\",",
+									"    \"NM\",",
+									"    \"NV\",",
+									"    \"NY\",",
+									"    \"OH\",",
+									"    \"OK\",",
+									"    \"OR\",",
+									"    \"PA\",",
+									"    \"PR\",",
+									"    \"RI\",",
+									"    \"SC\",",
+									"    \"SD\",",
+									"    \"TN\",",
+									"    \"TX\",",
+									"    \"UT\",",
+									"    \"VA\",",
+									"    \"VI\",",
+									"    \"VT\",",
+									"    \"WA\",",
+									"    \"WI\",",
+									"    \"WV\",",
+									"    \"WY\"];",
+									"var feeTypes = [",
+									"    \"lumper\",",
+									"    \"fuelAdvance\",",
+									"    \"detention\",",
+									"    \"fees\",",
+									"    \"assesorial\",",
+									"    \"drayage\",",
+									"    \"chassis\"",
+									"];",
+									"",
+									"//set Collection Variables==========================================================",
+									"pm.collectionVariables.set(\"isoTime1\", moment().format());",
+									"pm.collectionVariables.set(\"isoTime2\", moment().format());",
+									"pm.collectionVariables.set(\"validEquipmentType\", _.sample(equips));",
+									"pm.collectionVariables.set(\"randomState\", _.sample(states))",
+									"pm.collectionVariables.set('randLat1', _.random(37,64,true))",
+									"pm.collectionVariables.set('randLong1', _.random(105,159,true))",
+									"pm.collectionVariables.set('randLat2', _.random(37,64,true))",
+									"pm.collectionVariables.set('randLong2', _.random(105,159,true))",
+									"pm.collectionVariables.set('randLat3', _.random(37,64,true))",
+									"pm.collectionVariables.set('randLong3', _.random(105,159,true))",
+									"pm.collectionVariables.set('randFloat1', _.random(1,10,true))",
+									"pm.collectionVariables.set('randFloat2', _.random(1,10,true))",
+									"pm.collectionVariables.set('randomFeeType', _.sample(feeTypes));"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "DELETE",
+					"item": []
+				},
+				{
+					"name": "PATCH",
+					"item": [
+						{
+							"name": "ConvertPrebuiltLoadsByIds",
+							"item": [
+								{
+									"name": "Setup Test Load",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"postman.setEnvironmentVariable(\"testPrebuiltPostingId\", pm.variables.replaceIn('{{$randomBitcoin}}'))"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"Load setup succeeds - returns 2xx\", ()=> {\r",
+													"    pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{Ocp-Apim-Subscription-Key}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "Ocp-Apim-Subscription-Key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "transactionID",
+												"value": "{{$randomBitcoin}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"postingId\": \"{{testPrebuiltPostingId}}\",\r\n    \"brokerRefNumber\": \"SRT-REF-NUM\",\r\n    \"earliestPickup\": \"{{isoTime1}}\",\r\n    \"latestPickup\": \"{{isoTime2}}\",\r\n    \"lane\": {\r\n        \"origin\": {\r\n            \"address1\": \"{{$randomStreetAddress}}\",\r\n            \"address2\": \"\",\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\"\r\n        },\r\n        \"destination\": {\r\n            \"city\": \"{{$randomCity}}\",\r\n            \"state\": \"{{randomState}}\"\r\n        },\r\n        \"equipmentType\": \"TT\",\r\n        \"postedRate\": \"{{$randomPrice}}\"\r\n    },\r\n    \"brokerInfo\": {\r\n        \"mcNumber\": \"{{testPrebuiltCustMcNumber}}\",\r\n        \"name\": \"{{$randomCompanyName}}\"\r\n    },\r\n    \"carrierInfo\": {\r\n        \"partnerCarrierId\": \"{{testPrebuiltPartnerCarrierId}}\",\r\n        \"mcNumber\":  \"{{testPrebuiltClientMcNumber}}\",\r\n        \"dotNumber\": \"{{$randomInt}}\"\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/load",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"load"
+											]
+										},
+										"description": "Create Shipment Load Record.   Loads function as a precursor to invoices in Factorhawk."
+									},
+									"response": []
+								},
+								{
+									"name": "TC01: Valid Response",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"Status code is 200\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{Ocp-Apim-Subscription-Key}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "Ocp-Apim-Subscription-Key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "[\r\n    {\r\n        \"PostingId\": \"{{testPrebuiltPostingId}}\",\r\n        \"PartnerCarrierId\": \"{{testPrebuiltPartnerCarrierId}}\",\r\n        \"BrokerRefNumber\": \"123654\",\r\n        \"Customer\": \"Customer\",\r\n        \"OriginCity\": \"Augusta\",\r\n        \"OriginState\": \"GA\",\r\n        \"OriginZip\": \"30909\",\r\n        \"DestinationCity\": \"Pittsburgh\",\r\n        \"DestinationState\": \"PA\",\r\n        \"DestinationZip\": \"15212\",\r\n        \"EarliestPickUpDate\": \"2022-12-01T00:00:00\",\r\n        \"Rate\": 100.52,\r\n        \"Status\": \"NEW\"\r\n    }\r\n]",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{ServiceBaseEndpoint}}/invoices/prebuilt-load-convert",
+											"protocol": "https",
+											"host": [
+												"{{ServiceBaseEndpoint}}"
+											],
+											"path": [
+												"invoices",
+												"prebuilt-load-convert"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"//define enums================================================================",
+									"var moment = require('moment');",
+									"var equips = ",
+									"[\"AC\",",
+									"\"BT\",",
+									"\"CN\",",
+									"\"C\",",
+									"\"CI\",",
+									"\"CR\",",
+									"\"CV\",",
+									"\"DD\",",
+									"\"LA\",",
+									"\"DT\",",
+									"\"F\",",
+									"\"FA\",",
+									"\"FN\",",
+									"\"F2\",",
+									"\"FZ\",",
+									"\"FH\",",
+									"\"MX\",",
+									"\"FD\",",
+									"\"FO\",",
+									"\"FC\",",
+									"\"FS\",",
+									"\"FT\",",
+									"\"FM\",",
+									"\"FR\",",
+									"\"HB\",",
+									"\"IR\",",
+									"\"LB\",",
+									"\"LR\",",
+									"\"LO\",",
+									"\"MV\",",
+									"\"NU\",",
+									"\"PO\",",
+									"\"R\",",
+									"\"RA\",",
+									"\"R2\",",
+									"\"RZ\",",
+									"\"RN\",",
+									"\"RL\",",
+									"\"RV\",",
+									"\"RP\",",
+									"\"RM\",",
+									"\"RG\",",
+									"\"SD\",",
+									"\"SR\",",
+									"\"SN\",",
+									"\"SB\",",
+									"\"ST\",",
+									"\"TA\",",
+									"\"TN\",",
+									"\"TS\",",
+									"\"TT\",",
+									"\"V\",",
+									"\"VA\",",
+									"\"VW\",",
+									"\"VS\",",
+									"\"V2\",",
+									"\"VZ\",",
+									"\"VH\",",
+									"\"VI\",",
+									"\"VN\",",
+									"\"VG\",",
+									"\"VL\",",
+									"\"OT\",",
+									"\"VF\",",
+									"\"VT\",",
+									"\"VR\",",
+									"\"VP\",",
+									"\"VB\",",
+									"\"V3\",",
+									"\"VV\",",
+									"\"VC\",",
+									"\"VM\"];",
+									"var states = [ ",
+									"    \"AK\",",
+									"    \"AL\",",
+									"    \"AR\",",
+									"    \"AS\",",
+									"    \"AZ\",",
+									"    \"CA\",",
+									"    \"CO\",",
+									"    \"CT\",",
+									"    \"DC\",",
+									"    \"DE\",",
+									"    \"FL\",",
+									"    \"GA\",",
+									"    \"GU\",",
+									"    \"HI\",",
+									"    \"IA\",",
+									"    \"ID\",",
+									"    \"IL\",",
+									"    \"IN\",",
+									"    \"KS\",",
+									"    \"KY\",",
+									"    \"LA\",",
+									"    \"MA\",",
+									"    \"MD\",",
+									"    \"ME\",",
+									"    \"MI\",",
+									"    \"MN\",",
+									"    \"MO\",",
+									"    \"MS\",",
+									"    \"MT\",",
+									"    \"NC\",",
+									"    \"ND\",",
+									"    \"NE\",",
+									"    \"NH\",",
+									"    \"NJ\",",
+									"    \"NM\",",
+									"    \"NV\",",
+									"    \"NY\",",
+									"    \"OH\",",
+									"    \"OK\",",
+									"    \"OR\",",
+									"    \"PA\",",
+									"    \"PR\",",
+									"    \"RI\",",
+									"    \"SC\",",
+									"    \"SD\",",
+									"    \"TN\",",
+									"    \"TX\",",
+									"    \"UT\",",
+									"    \"VA\",",
+									"    \"VI\",",
+									"    \"VT\",",
+									"    \"WA\",",
+									"    \"WI\",",
+									"    \"WV\",",
+									"    \"WY\"];",
+									"var feeTypes = [",
+									"    \"lumper\",",
+									"    \"fuelAdvance\",",
+									"    \"detention\",",
+									"    \"fees\",",
+									"    \"assesorial\",",
+									"    \"drayage\",",
+									"    \"chassis\"",
+									"];",
+									"",
+									"//set Collection Variables==========================================================",
+									"pm.collectionVariables.set(\"isoTime1\", moment().format());",
+									"pm.collectionVariables.set(\"isoTime2\", moment().format());",
+									"pm.collectionVariables.set(\"validEquipmentType\", _.sample(equips));",
+									"pm.collectionVariables.set(\"randomState\", _.sample(states))",
+									"pm.collectionVariables.set('randLat1', _.random(37,64,true))",
+									"pm.collectionVariables.set('randLong1', _.random(105,159,true))",
+									"pm.collectionVariables.set('randLat2', _.random(37,64,true))",
+									"pm.collectionVariables.set('randLong2', _.random(105,159,true))",
+									"pm.collectionVariables.set('randLat3', _.random(37,64,true))",
+									"pm.collectionVariables.set('randLong3', _.random(105,159,true))",
+									"pm.collectionVariables.set('randFloat1', _.random(1,10,true))",
+									"pm.collectionVariables.set('randFloat2', _.random(1,10,true))",
+									"pm.collectionVariables.set('randomFeeType', _.sample(feeTypes));"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "ConvertPrebuiltLoadsByIds",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"PostingId\": \"{{testPrebuiltPostingId}}\",\r\n        \"PartnerCarrierId\": \"{{testPrebuiltPartnerCarrierId}}\",\r\n        \"BrokerRefNumber\": \"123654\",\r\n        \"Customer\": \"Customer\",\r\n        \"OriginCity\": \"Augusta\",\r\n        \"OriginState\": \"GA\",\r\n        \"OriginZip\": \"30909\",\r\n        \"DestinationCity\": \"Pittsburgh\",\r\n        \"DestinationState\": \"PA\",\r\n        \"DestinationZip\": \"15212\",\r\n        \"EarliestPickUpDate\": \"2022-12-01T00:00:00\",\r\n        \"Rate\": 100.52,\r\n        \"Status\": \"NEW\"\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{ServiceBaseEndpoint}}/invoices/prebuilt-load-convert",
+							"protocol": "https",
+							"host": [
+								"{{ServiceBaseEndpoint}}"
+							],
+							"path": [
+								"invoices",
+								"prebuilt-load-convert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetPrebuiltLoadById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ServiceBaseEndpoint}}/invoices/prebuilt-load-by-id?postingId&partnerCarrierId",
+							"protocol": "https",
+							"host": [
+								"{{ServiceBaseEndpoint}}"
+							],
+							"path": [
+								"invoices",
+								"prebuilt-load-by-id"
+							],
+							"query": [
+								{
+									"key": "postingId",
+									"value": null
+								},
+								{
+									"key": "partnerCarrierId",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetRecentPrebuiltLoadsByMcNumbers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{ServiceBaseEndpoint}}/invoices/recent-prebuilt-loads-by-mcNumbers?clientMcNumber&customerMcNumber&customerName&skip&take&sortSelector&sortDescending",
+							"protocol": "https",
+							"host": [
+								"{{ServiceBaseEndpoint}}"
+							],
+							"path": [
+								"invoices",
+								"recent-prebuilt-loads-by-mcNumbers"
+							],
+							"query": [
+								{
+									"key": "clientMcNumber",
+									"value": null
+								},
+								{
+									"key": "customerMcNumber",
+									"value": null
+								},
+								{
+									"key": "customerName",
+									"value": null
+								},
+								{
+									"key": "skip",
+									"value": null
+								},
+								{
+									"key": "take",
+									"value": null
+								},
+								{
+									"key": "sortSelector",
+									"value": null
+								},
+								{
+									"key": "sortDescending",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "isoTime1",
+			"value": ""
+		},
+		{
+			"key": "isoTime2",
+			"value": ""
+		},
+		{
+			"key": "validEquipmentType",
+			"value": ""
+		},
+		{
+			"key": "randomState",
+			"value": ""
+		},
+		{
+			"key": "randLat1",
+			"value": ""
+		},
+		{
+			"key": "randLong1",
+			"value": ""
+		},
+		{
+			"key": "randLat2",
+			"value": ""
+		},
+		{
+			"key": "randLong2",
+			"value": ""
+		},
+		{
+			"key": "randLat3",
+			"value": ""
+		},
+		{
+			"key": "randLong3",
+			"value": ""
+		},
+		{
+			"key": "randFloat1",
+			"value": ""
+		},
+		{
+			"key": "randFloat2",
+			"value": ""
+		},
+		{
+			"key": "randomFeeType",
+			"value": ""
+		}
+	]
+}

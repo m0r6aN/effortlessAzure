@@ -1,0 +1,11 @@
+{
+    "sourceApimName": "dev-factorhawk-api-apim-eastus",
+    "destinationApimName": "dev-factorhawk-api-apim-eastus",
+    "resourceGroup": "dev-factorhawk-api-rg-eastus",
+    "fileFolder": "C:\\Users\\Zavier.Barker\\Documents\\Serverless\\Invoices\\APImDeployment\\armTemplates",
+    "apiName": "dev-factorhawk-invoices-apia-eastus",
+    "linkedTemplatesBaseUrl": "",
+    "linkedTemplatesUrlQueryString": "",
+    "paramServiceUrl": true
+}
+
